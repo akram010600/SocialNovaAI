@@ -11,6 +11,7 @@ function App() {
 
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
 
   async function createPost(){
@@ -45,15 +46,27 @@ function App() {
 
       setResult(data.result);
 
-
     } catch(error){
 
       setResult("حدث خطأ في الاتصال بالخادم");
 
     }
 
-
     setLoading(false);
+
+  }
+
+
+
+  function copyContent(){
+
+    navigator.clipboard.writeText(result);
+
+    setCopied(true);
+
+    setTimeout(()=>{
+      setCopied(false);
+    },2000);
 
   }
 
@@ -68,7 +81,7 @@ function App() {
         <h1>🚀 SocialNova AI</h1>
 
         <p>
-        لوحة التحكم الذكية لإدارة وصناعة المحتوى
+          لوحة التحكم الذكية لإدارة وصناعة المحتوى
         </p>
 
       </header>
@@ -76,7 +89,6 @@ function App() {
 
 
       <div className="card">
-
 
         <h2>✨ إنشاء منشور جديد</h2>
 
@@ -93,15 +105,12 @@ function App() {
 
 
 
-        <select
-        value={field}
-        onChange={(e)=>setField(e.target.value)}
-        >
+        <select value={field} onChange={(e)=>setField(e.target.value)}>
 
           <option>عام</option>
+          <option>عقارات</option>
           <option>مطاعم</option>
           <option>حضانة</option>
-          <option>عقارات</option>
           <option>ملابس</option>
           <option>خدمات</option>
 
@@ -109,11 +118,7 @@ function App() {
 
 
 
-
-        <select
-        value={goal}
-        onChange={(e)=>setGoal(e.target.value)}
-        >
+        <select value={goal} onChange={(e)=>setGoal(e.target.value)}>
 
           <option>زيادة المبيعات</option>
           <option>زيادة المتابعين</option>
@@ -124,11 +129,7 @@ function App() {
 
 
 
-
-        <select
-        value={type}
-        onChange={(e)=>setType(e.target.value)}
-        >
+        <select value={type} onChange={(e)=>setType(e.target.value)}>
 
           <option>إعلان</option>
           <option>منشور تسويقي</option>
@@ -139,11 +140,7 @@ function App() {
 
 
 
-
-        <select
-        value={platform}
-        onChange={(e)=>setPlatform(e.target.value)}
-        >
+        <select value={platform} onChange={(e)=>setPlatform(e.target.value)}>
 
           <option>فيسبوك</option>
           <option>انستجرام</option>
@@ -154,28 +151,42 @@ function App() {
 
 
 
-
         <button onClick={createPost}>
 
           {
-          loading 
-          ? "جاري الإنشاء..."
-          : "إنشاء بالذكاء الاصطناعي"
+            loading
+            ? "جاري الإنشاء..."
+            : "إنشاء بالذكاء الاصطناعي"
           }
 
         </button>
 
 
 
+        {
+          result &&
 
-        <div className="result">
+          <div className="result">
 
-          <h3>النتيجة:</h3>
+            <h3>النتيجة:</h3>
 
-          <p>{result}</p>
+            <p>{result}</p>
 
-        </div>
 
+            <button onClick={copyContent}>
+
+              {
+                copied
+                ? "✅ تم النسخ"
+                : "📋 نسخ المحتوى"
+              }
+
+            </button>
+
+
+          </div>
+
+        }
 
 
       </div>
