@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Dashboard from "../pages/Dashboard";
+import Posts from "../pages/Posts";
+
 import MainLayout from "../layouts/MainLayout";
 
 
@@ -18,6 +20,16 @@ function AppRoutes(){
                     element={
                         <MainLayout>
                             <Dashboard />
+                        </MainLayout>
+                    }
+                />
+
+
+                <Route
+                    path="/posts"
+                    element={
+                        <MainLayout>
+                            <Posts />
                         </MainLayout>
                     }
                 />

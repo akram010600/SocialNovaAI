@@ -1,31 +1,77 @@
 const API_URL = "http://127.0.0.1:8000/api";
 
 
-export async function createPost(data){
+async function request(url, options = {}) {
 
-    const response = await fetch(
-        `${API_URL}/create`,
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(data)
+    try {
+
+        const response = await fetch(
+            `${API_URL}${url}`,
+            {
+                ...options,
+                headers:{
+                    "Content-Type":"application/json",
+                    ...options.headers
+                }
+            }
+        );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                `API Error: ${response.status}`
+            );
+
         }
-    );
 
-    return await response.json();
+
+        return await response.json();
+
+
+    } catch(error){
+
+        console.error(
+            "API Connection Error:",
+            error
+        );
+
+        throw error;
+
+    }
 
 }
 
 
 
-export async function getDashboard(){
+export function getDashboard(){
 
-    const response = await fetch(
-        `${API_URL}/dashboard`
+    return request(
+        "/dashboard"
     );
 
-    return await response.json();
+}
+
+
+
+export function getPosts(){
+
+    return request(
+        "/posts"
+    );
+
+}
+
+
+
+export function createPost(data){
+
+    return request(
+        "/create",
+        {
+            method:"POST",
+            body:JSON.stringify(data)
+        }
+    );
 
 }
