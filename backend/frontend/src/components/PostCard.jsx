@@ -1,35 +1,78 @@
-function PostCard({post}){
+import { useState } from "react";
 
 
-return (
+function PostCard({ post }) {
 
-<div className="post-card">
-
-
-<h3>
-{post.idea}
-</h3>
+    const [copied, setCopied] = useState(false);
 
 
-<p>
-📂 {post.field}
-</p>
+    function copyContent(){
+
+        navigator.clipboard.writeText(post.content);
+
+        setCopied(true);
 
 
-<p>
-🎯 {post.goal}
-</p>
+        setTimeout(()=>{
+
+            setCopied(false);
+
+        },2000);
+
+    }
 
 
-<p>
-📱 {post.platform}
-</p>
+
+    return (
+
+        <div className="card post-card" dir="rtl">
 
 
-</div>
+            <h2>
+                {post.idea}
+            </h2>
 
-);
 
+            <p>
+                📂 المجال: {post.field}
+            </p>
+
+
+            <p>
+                🎯 الهدف: {post.goal}
+            </p>
+
+
+            <p>
+                📱 المنصة: {post.platform}
+            </p>
+
+
+            <p>
+                📌 النوع: {post.content_type}
+            </p>
+
+
+
+            <div className="content-box">
+
+                {post.content}
+
+            </div>
+
+
+
+            <button onClick={copyContent}>
+
+                {copied ? "✅ تم النسخ" : "📋 نسخ المحتوى"}
+
+            </button>
+
+
+
+        </div>
+
+    );
 
 }
 
