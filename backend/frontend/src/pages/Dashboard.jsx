@@ -26,16 +26,34 @@ function Dashboard(){
 
             const data = await getDashboard();
 
-            setDashboard(data);
+
+            setDashboard({
+
+                total_posts: data.total_posts || 0,
+
+                top_field: data.top_field || "",
+
+                top_platform: data.top_platform || "",
+
+                latest_posts: data.latest_posts || []
+
+            });
+
 
         }
+
         catch(error){
 
-            console.log(error);
+            console.log(
+                "Dashboard Error:",
+                error
+            );
+
 
         }
 
     }
+
 
 
 
@@ -44,6 +62,8 @@ function Dashboard(){
         loadDashboard();
 
     },[]);
+
+
 
 
 
@@ -60,11 +80,14 @@ function Dashboard(){
 
 
 
+
             <CreatePost
 
                 refreshDashboard={loadDashboard}
 
             />
+
+
 
 
 
@@ -77,12 +100,30 @@ function Dashboard(){
 
 
 
+
                 {
+
+                    dashboard.latest_posts.length === 0
+
+                    ?
+
+                    <p>
+                        لا توجد منشورات حالياً
+                    </p>
+
+
+                    :
+
+
                     dashboard.latest_posts.map(post=>(
 
+
                         <div
+
                             className="post"
+
                             key={post.id}
+
                         >
 
 
@@ -91,9 +132,11 @@ function Dashboard(){
                             </b>
 
 
+
                             <p>
                                 المجال: {post.field}
                             </p>
+
 
 
                             <p>
@@ -101,13 +144,25 @@ function Dashboard(){
                             </p>
 
 
+
+                            <p>
+                                النوع: {post.content_type}
+                            </p>
+
+
+
                         </div>
 
+
                     ))
+
+
                 }
 
 
+
             </div>
+
 
 
         </div>

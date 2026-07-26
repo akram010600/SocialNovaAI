@@ -15,17 +15,19 @@ function Posts(){
 
 
 
+    async function loadPosts(){
+
+        const data = await getPosts();
+
+        setPosts(data);
+
+    }
+
+
+
     useEffect(()=>{
 
-        async function load(){
-
-            const data = await getPosts();
-
-            setPosts(data);
-
-        }
-
-        load();
+        loadPosts();
 
     },[]);
 
@@ -33,13 +35,14 @@ function Posts(){
 
     const fields = [
         "الكل",
-        ...new Set(posts.map(post => post.field))
+        ...new Set(posts.map(post=>post.field))
     ];
+
 
 
     const platforms = [
         "الكل",
-        ...new Set(posts.map(post => post.platform))
+        ...new Set(posts.map(post=>post.platform))
     ];
 
 
@@ -48,21 +51,21 @@ function Posts(){
 
 
         const matchSearch =
-            post.idea
-            .toLowerCase()
-            .includes(search.toLowerCase());
+        post.idea
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
 
 
         const matchField =
-            field === "الكل" ||
-            post.field === field;
+        field === "الكل" ||
+        post.field === field;
 
 
 
         const matchPlatform =
-            platform === "الكل" ||
-            post.platform === platform;
+        platform === "الكل" ||
+        post.platform === platform;
 
 
 
@@ -71,7 +74,6 @@ function Posts(){
             matchField &&
             matchPlatform
         );
-
 
     });
 
@@ -88,73 +90,77 @@ function Posts(){
 
 
 
-            <div className="card">
+            <input
 
+                type="text"
 
-                <input
+                placeholder="🔍 ابحث عن منشور..."
 
-                    type="text"
+                value={search}
 
-                    placeholder="🔍 ابحث عن منشور..."
+                onChange={
+                    e=>setSearch(e.target.value)
+                }
 
-                    value={search}
-
-                    onChange={(e)=>setSearch(e.target.value)}
-
-                />
-
-
-
-                <select
-
-                    value={field}
-
-                    onChange={(e)=>setField(e.target.value)}
-
-                >
-
-                    {
-                        fields.map(item=>(
-
-                            <option key={item}>
-                                {item}
-                            </option>
-
-                        ))
-                    }
-
-                </select>
+            />
 
 
 
-                <select
+            <select
 
-                    value={platform}
+                value={field}
 
-                    onChange={(e)=>setPlatform(e.target.value)}
+                onChange={
+                    e=>setField(e.target.value)
+                }
 
-                >
+            >
 
-                    {
-                        platforms.map(item=>(
+                {
+                    fields.map(item=>(
 
-                            <option key={item}>
-                                {item}
-                            </option>
+                        <option key={item}>
+                            {item}
+                        </option>
 
-                        ))
-                    }
+                    ))
+                }
 
-                </select>
+            </select>
 
 
-            </div>
+
+
+            <select
+
+                value={platform}
+
+                onChange={
+                    e=>setPlatform(e.target.value)
+                }
+
+            >
+
+                {
+                    platforms.map(item=>(
+
+                        <option key={item}>
+                            {item}
+                        </option>
+
+                    ))
+                }
+
+            </select>
+
+
+
+            <hr/>
 
 
 
 
             {
-
                 filteredPosts.map(post=>(
 
                     <PostCard
@@ -163,10 +169,11 @@ function Posts(){
 
                         post={post}
 
+                        refreshPosts={loadPosts}
+
                     />
 
                 ))
-
             }
 
 

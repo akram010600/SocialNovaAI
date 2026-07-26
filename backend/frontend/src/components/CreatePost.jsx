@@ -2,26 +2,26 @@ import { useState } from "react";
 import { createPost } from "../api/api";
 
 
-function CreatePost({refreshDashboard}) {
+function CreatePost({ refreshDashboard }) {
 
 
-    const [idea,setIdea] = useState("");
+    const [idea, setIdea] = useState("");
 
-    const [field,setField] = useState("عام");
-    const [goal,setGoal] = useState("زيادة المبيعات");
-    const [type,setType] = useState("إعلان");
-    const [platform,setPlatform] = useState("فيسبوك");
+    const [field, setField] = useState("عام");
+    const [goal, setGoal] = useState("زيادة المبيعات");
+    const [type, setType] = useState("إعلان");
+    const [platform, setPlatform] = useState("فيسبوك");
 
-    const [result,setResult] = useState("");
+    const [result, setResult] = useState("");
 
-    const [loading,setLoading] = useState(false);
-
-
-
-    async function handleCreate(){
+    const [loading, setLoading] = useState(false);
 
 
-        if(!idea) return;
+
+    async function handleCreate() {
+
+
+        if (!idea.trim()) return;
 
 
         setLoading(true);
@@ -33,9 +33,13 @@ function CreatePost({refreshDashboard}) {
             const data = await createPost({
 
                 idea,
+
                 field,
+
                 goal,
-                type,
+
+                content_type: type,
+
                 platform
 
             });
@@ -44,20 +48,23 @@ function CreatePost({refreshDashboard}) {
             setResult(data.result);
 
 
-            if(refreshDashboard){
+            if (refreshDashboard) {
 
                 refreshDashboard();
 
             }
 
 
-        }
+        } catch (error) {
 
-        catch(error){
+
+            console.log(error);
+
 
             setResult(
                 "حدث خطأ في الاتصال بالخادم"
             );
+
 
         }
 
@@ -69,9 +76,12 @@ function CreatePost({refreshDashboard}) {
 
 
 
+
+
     return (
 
-        <div className="card">
+
+        <div className="card" dir="rtl">
 
 
             <h2>
@@ -87,7 +97,7 @@ function CreatePost({refreshDashboard}) {
                 value={idea}
 
                 onChange={
-                    e=>setIdea(e.target.value)
+                    e => setIdea(e.target.value)
                 }
 
             />
@@ -95,101 +105,191 @@ function CreatePost({refreshDashboard}) {
 
 
             <select
-            value={field}
-            onChange={
-                e=>setField(e.target.value)
-            }>
+
+                value={field}
+
+                onChange={
+                    e => setField(e.target.value)
+                }
+
+            >
 
                 <option>عام</option>
                 <option>عقارات</option>
                 <option>مطاعم</option>
                 <option>حضانة</option>
                 <option>خدمات</option>
+                <option>ملابس</option>
+                <option>تسويق</option>
+                <option>تعليم</option>
 
             </select>
+
 
 
 
 
             <select
-            value={goal}
-            onChange={
-                e=>setGoal(e.target.value)
-            }>
 
-                <option>زيادة المبيعات</option>
-                <option>زيادة المتابعين</option>
-                <option>إعلان ممول</option>
+                value={goal}
+
+                onChange={
+                    e => setGoal(e.target.value)
+                }
+
+            >
+
+                <option>
+                    زيادة المبيعات
+                </option>
+
+                <option>
+                    زيادة المتابعين
+                </option>
+
+                <option>
+                    إعلان ممول
+                </option>
+
+
+                <option>
+                    بناء العلامة التجارية
+                </option>
+
 
             </select>
+
 
 
 
 
             <select
-            value={type}
-            onChange={
-                e=>setType(e.target.value)
-            }>
 
-                <option>إعلان</option>
-                <option>منشور تسويقي</option>
-                <option>عرض منتج</option>
+                value={type}
+
+                onChange={
+                    e => setType(e.target.value)
+                }
+
+            >
+
+                <option>
+                    إعلان
+                </option>
+
+                <option>
+                    منشور تسويقي
+                </option>
+
+                <option>
+                    عرض منتج
+                </option>
+
+                <option>
+                    محتوى تعليمي
+                </option>
+
 
             </select>
+
+
 
 
 
 
             <select
-            value={platform}
-            onChange={
-                e=>setPlatform(e.target.value)
-            }>
 
-                <option>فيسبوك</option>
-                <option>انستجرام</option>
-                <option>تيك توك</option>
+                value={platform}
+
+                onChange={
+                    e => setPlatform(e.target.value)
+                }
+
+            >
+
+                <option>
+                    فيسبوك
+                </option>
+
+                <option>
+                    انستجرام
+                </option>
+
+                <option>
+                    تيك توك
+                </option>
+
+                <option>
+                    لينكدإن
+                </option>
+
 
             </select>
 
 
 
 
-            <button onClick={handleCreate}>
+
+
+
+            <button
+
+                onClick={handleCreate}
+
+                disabled={loading}
+
+            >
 
                 {
+
                     loading
+
                     ?
-                    "جاري الإنشاء..."
+
+                    "⏳ جاري الإنشاء..."
+
                     :
+
                     "🚀 إنشاء بالذكاء الاصطناعي"
+
                 }
+
 
             </button>
 
 
 
+
+
+
+
             {
+
                 result &&
 
+
                 <div className="result">
+
 
                     <h3>
                         النتيجة:
                     </h3>
 
+
                     <p>
                         {result}
                     </p>
 
+
                 </div>
+
 
             }
 
 
 
         </div>
+
 
     );
 

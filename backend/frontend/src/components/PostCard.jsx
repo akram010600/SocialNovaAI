@@ -1,9 +1,10 @@
 import { useState } from "react";
 
 
-function PostCard({ post }) {
+function PostCard({ post, refreshPosts }) {
 
     const [copied, setCopied] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
 
     function copyContent(){
@@ -18,6 +19,53 @@ function PostCard({ post }) {
             setCopied(false);
 
         },2000);
+
+    }
+
+
+
+    async function deletePost(){
+
+        const confirmDelete = window.confirm(
+            "هل تريد حذف هذا المنشور؟"
+        );
+
+
+        if(!confirmDelete) return;
+
+
+        setDeleting(true);
+
+
+        try {
+
+            await fetch(
+                `http://127.0.0.1:8000/api/posts/${post.id}`,
+                {
+                    method:"DELETE"
+                }
+            );
+
+
+            if(refreshPosts){
+
+                refreshPosts();
+
+            }
+
+
+        }
+
+        catch(error){
+
+            alert(
+                "حدث خطأ أثناء حذف المنشور"
+            );
+
+        }
+
+
+        setDeleting(false);
 
     }
 
@@ -65,6 +113,24 @@ function PostCard({ post }) {
             <button onClick={copyContent}>
 
                 {copied ? "✅ تم النسخ" : "📋 نسخ المحتوى"}
+
+            </button>
+
+
+
+            <button 
+                onClick={deletePost}
+                disabled={deleting}
+                style={{marginTop:"10px"}}
+            >
+
+                {
+                    deleting
+                    ?
+                    "جاري الحذف..."
+                    :
+                    "🗑 حذف المنشور"
+                }
 
             </button>
 
