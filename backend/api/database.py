@@ -1,15 +1,16 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy import create_engine, Column, Integer, String, Text, func
 from sqlalchemy.orm import declarative_base, sessionmaker
 
+# ==========================
+# Database Configuration
+# ==========================
 
 DATABASE_URL = "sqlite:///./socialnova.db"
-
 
 engine = create_engine(
     DATABASE_URL,
     connect_args={"check_same_thread": False}
 )
-
 
 SessionLocal = sessionmaker(
     autocommit=False,
@@ -17,77 +18,136 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
-
 Base = declarative_base()
 
 
-class Post(Base):
+# ==========================
+# Database Model
+# ==========================
 
+class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    idea = Column(String)
+    idea = Column(String(255), nullable=False)
+    field = Column(String(100), nullable=False)
+    goal = Column(String(100), nullable=False)
+    platform = Column(String(100), nullable=False)
+    content_type = Column(String(100), nullable=False)
 
-    field = Column(String)
-
-    goal = Column(String)
-
-    platform = Column(String)
-
-    content_type = Column(String)
-
-    content = Column(Text)
-
+    content = Column(Text, nullable=False)
 
 
 Base.metadata.create_all(bind=engine)
 
 
-
-# حفظ منشور جديد
+# ==========================
+# Save New Post
+# ==========================
 
 def save_post(
-    idea,
-    field,
-    goal,
-    platform,
-    content_type,
-    content
+    idea: str,
+    field: str,
+    goal: str,
+    platform: str,
+    content_type: str,
+    content: str,
 ):
-
     db = SessionLocal()
 
-    post = Post(
-        idea=idea,
-        field=field,
-        goal=goal,
-        platform=platform,
-        content_type=content_type,
-        content=content
-    )
+    try:
+        post = Post(
+            idea=idea,
+            field=field,
+            goal=goal,
+            platform=platform,
+            content_type=content_type,
+            content=content,
+        )
+
+        db.add(post)
+        db.commit()
+        db.refresh(post)
+
+        return post
+
+    finally:
+        db.close()
 
 
-    db.add(post)
-
-    db.commit()
-
-    db.refresh(post)
-
-    db.close()
-
-    return post
-
-
-
-# جلب كل المنشورات
+# ==========================
+# Get All Posts
+# ==========================
 
 def get_posts():
-
     db = SessionLocal()
 
-    posts = db.query(Post).all()
+    try:
+        return (
+            db.query(Post)
+            .order_by(Post.id.desc())
+            .all()
+        )
 
-    db.close()
+    finally:
+        db.close()
 
-    return posts
+
+# ==========================
+# Dashboard Statistics
+# ==========================
+
+def get_dashboard_stats():
+    db = SessionLocal()
+
+    try:
+        total_posts = db.query(Post).count()
+
+        latest_posts = (
+            db.query(Post)
+            .order_by(Post.id.desc())
+            .limit(5)
+            .all()
+        )
+
+        top_field = (
+            db.query(
+                Post.field,
+                func.count(Post.id).label("count")
+            )
+            .group_by(Post.field)
+            .order_by(func.count(Post.id).desc())
+            .first()
+        )
+
+        top_platform = (
+            db.query(
+                Post.platform,
+                func.count(Post.id).label("count")
+            )
+            .group_by(Post.platform)
+            .order_by(func.count(Post.id).desc())
+            .first()
+        )
+
+        return {
+            "total_posts": total_posts,
+            "top_field": top_field[0] if top_field else "لا يوجد",
+            "top_platform": top_platform[0] if top_platform else "لا يوجد",
+            "latest_posts": [
+                {
+                    "id": post.id,
+                    "idea": post.idea,
+                    "field": post.field,
+                    "goal": post.goal,
+                    "platform": post.platform,
+                    "content_type": post.content_type,
+                    "content": post.content,
+                }
+                for post in latest_posts
+            ],
+        }
+
+    finally:
+        db.close()
