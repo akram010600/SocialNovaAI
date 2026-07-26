@@ -13,13 +13,10 @@ from ai_engine import generate_content
 
 app = FastAPI(
     title="SocialNova AI API",
-    version="1.9"
+    version="1.8"
 )
 
 
-# ==========================
-# CORS
-# ==========================
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,9 +27,6 @@ app.add_middleware(
 )
 
 
-# ==========================
-# Request Model
-# ==========================
 
 class PostRequest(BaseModel):
 
@@ -42,15 +36,12 @@ class PostRequest(BaseModel):
 
     goal: str = "زيادة المبيعات"
 
-    type: str = "إعلان"
+    content_type: str = "إعلان"
 
     platform: str = "فيسبوك"
 
 
 
-# ==========================
-# Home
-# ==========================
 
 @app.get("/api/")
 def home():
@@ -61,59 +52,38 @@ def home():
 
 
 
-# ==========================
-# Create AI Post
-# ==========================
 
 @app.post("/api/create")
 def create_post(data: PostRequest):
 
 
-    content = generate_content(
-
+    result = generate_content(
         data.idea,
-
         data.field,
-
         data.goal,
-
-        data.type,
-
+        data.content_type,
         data.platform
-
     )
 
 
     save_post(
-
-        idea=data.idea,
-
-        field=data.field,
-
-        goal=data.goal,
-
-        platform=data.platform,
-
-        content_type=data.type,
-
-        content=content
-
+        data.idea,
+        data.field,
+        data.goal,
+        data.platform,
+        data.content_type,
+        result
     )
 
 
     return {
 
-        "success": True,
-
-        "result": content
+        "result": result
 
     }
 
 
 
-# ==========================
-# All Posts
-# ==========================
 
 @app.get("/api/posts")
 def posts():
@@ -122,9 +92,6 @@ def posts():
 
 
 
-# ==========================
-# Dashboard
-# ==========================
 
 @app.get("/api/dashboard")
 def dashboard():
