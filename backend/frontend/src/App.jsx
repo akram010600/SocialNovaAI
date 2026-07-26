@@ -1,44 +1,76 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
+
 function App() {
 
-  const [idea, setIdea] = useState("");
-  const [field, setField] = useState("عام");
-  const [goal, setGoal] = useState("زيادة المبيعات");
-  const [type, setType] = useState("إعلان");
-  const [platform, setPlatform] = useState("فيسبوك");
 
-  const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const API = "http://127.0.0.1:8000/api";
 
-  const [dashboard, setDashboard] = useState({
-    total_posts: 0,
-    top_field: "",
-    top_platform: "",
-    latest_posts: []
+
+  const [idea,setIdea] = useState("");
+
+  const [field,setField] = useState("عام");
+
+  const [goal,setGoal] = useState("زيادة المبيعات");
+
+  const [type,setType] = useState("إعلان");
+
+  const [platform,setPlatform] = useState("فيسبوك");
+
+
+  const [result,setResult] = useState("");
+
+  const [loading,setLoading] = useState(false);
+
+  const [copied,setCopied] = useState(false);
+
+
+  const [dashboard,setDashboard] = useState({
+
+    total_posts:0,
+
+    top_field:"",
+
+    top_platform:"",
+
+    latest_posts:[]
+
   });
 
 
 
+  // تحميل Dashboard
+
   async function loadDashboard(){
 
-    try {
 
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/dashboard"
+    try{
+
+
+      const res = await fetch(
+        `${API}/dashboard`
       );
 
-      const data = await response.json();
+
+      const data = await res.json();
+
 
       setDashboard(data);
 
-    } catch(error){
 
-      console.log(error);
+
+    }catch(error){
+
+
+      console.log(
+        "Dashboard Error",
+        error
+      );
+
 
     }
+
 
   }
 
@@ -46,7 +78,9 @@ function App() {
 
   useEffect(()=>{
 
+
     loadDashboard();
+
 
   },[]);
 
@@ -54,57 +88,101 @@ function App() {
 
 
 
+  // إنشاء منشور
+
+
   async function createPost(){
 
-    if(!idea){
+
+    if(!idea.trim()){
+
+      alert("اكتب فكرة المنشور أولا");
+
       return;
+
     }
+
 
 
     setLoading(true);
 
 
+
     try{
 
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/create",
+
+      const res = await fetch(
+
+        `${API}/create`,
+
         {
+
           method:"POST",
+
           headers:{
+
             "Content-Type":"application/json"
+
           },
+
+
           body:JSON.stringify({
+
             idea,
+
             field,
+
             goal,
+
             type,
+
             platform
+
           })
+
+
         }
+
       );
 
 
-      const data = await response.json();
+
+      const data = await res.json();
+
 
 
       setResult(data.result);
 
 
+
+      setIdea("");
+
+
+
       loadDashboard();
+
 
 
     }catch(error){
 
+
+
       setResult(
-        "حدث خطأ في الاتصال بالخادم"
+        "❌ لا يوجد اتصال بالخادم"
       );
+
+
 
     }
 
 
+
     setLoading(false);
 
+
+
   }
+
 
 
 
@@ -112,304 +190,418 @@ function App() {
 
   function copyContent(){
 
+
     navigator.clipboard.writeText(result);
+
 
     setCopied(true);
 
 
+
     setTimeout(()=>{
+
 
       setCopied(false);
 
+
     },2000);
+
+
 
   }
 
 
 
 
-  return (
 
-    <div className="container" dir="rtl">
+return (
 
 
-      <header>
+<div className="container" dir="rtl">
 
-        <h1>
-          🚀 SocialNova AI
-        </h1>
 
-        <p>
-          لوحة التحكم الذكية لإدارة وصناعة المحتوى
-        </p>
 
-      </header>
+<header>
 
 
+<h1>
+🚀 SocialNova AI
+</h1>
 
-      <div className="dashboard">
 
+<p>
+لوحة التحكم الذكية لإدارة وصناعة المحتوى
+</p>
 
-        <div className="stat">
 
-          📊
-          <h3>
-            عدد المنشورات
-          </h3>
+</header>
 
-          <strong>
-            {dashboard.total_posts}
-          </strong>
 
-        </div>
 
 
 
-        <div className="stat">
+<div className="dashboard">
 
-          🏆
-          <h3>
-            أكثر مجال
-          </h3>
 
-          <strong>
-            {dashboard.top_field}
-          </strong>
 
-        </div>
+<div className="stat">
 
+<h3>
+📊 عدد المنشورات
+</h3>
 
 
-        <div className="stat">
+<strong>
+{dashboard.total_posts}
+</strong>
 
-          📱
-          <h3>
-            أكثر منصة
-          </h3>
 
-          <strong>
-            {dashboard.top_platform}
-          </strong>
+</div>
 
-        </div>
 
 
-      </div>
 
+<div className="stat">
 
 
+<h3>
+🏆 أكثر مجال
+</h3>
 
 
-      <div className="card">
+<strong>
+{
+dashboard.top_field || "لا يوجد"
+}
+</strong>
 
 
-        <h2>
-          ✨ إنشاء منشور جديد
-        </h2>
+</div>
 
 
 
-        <textarea
 
-          placeholder="اكتب فكرة المنشور هنا..."
 
-          value={idea}
+<div className="stat">
 
-          onChange={(e)=>setIdea(e.target.value)}
 
-        />
+<h3>
+📱 أكثر منصة
+</h3>
 
 
+<strong>
+{
+dashboard.top_platform || "لا يوجد"
+}
+</strong>
 
 
-        <select value={field}
-        onChange={(e)=>setField(e.target.value)}>
+</div>
 
-          <option>عام</option>
-          <option>عقارات</option>
-          <option>مطاعم</option>
-          <option>حضانة</option>
-          <option>خدمات</option>
 
-        </select>
 
+</div>
 
 
 
 
-        <select value={goal}
-        onChange={(e)=>setGoal(e.target.value)}>
 
 
-          <option>
-            زيادة المبيعات
-          </option>
+<div className="card">
 
-          <option>
-            زيادة المتابعين
-          </option>
 
-          <option>
-            إعلان ممول
-          </option>
+<h2>
+✨ إنشاء منشور جديد
+</h2>
 
 
-        </select>
 
 
+<textarea
 
+placeholder="اكتب فكرة المنشور هنا..."
 
+value={idea}
 
-        <select value={type}
-        onChange={(e)=>setType(e.target.value)}>
+onChange={
+e=>setIdea(e.target.value)
+}
 
+/>
 
-          <option>
-            إعلان
-          </option>
 
-          <option>
-            منشور تسويقي
-          </option>
 
-          <option>
-            عرض منتج
-          </option>
 
+<select
+value={field}
+onChange={
+e=>setField(e.target.value)
+}
+>
 
-        </select>
+<option>عام</option>
 
+<option>عقارات</option>
 
+<option>مطاعم</option>
 
+<option>حضانة</option>
 
+<option>خدمات</option>
 
-        <select value={platform}
-        onChange={(e)=>setPlatform(e.target.value)}>
+<option>ملابس</option>
 
 
-          <option>
-            فيسبوك
-          </option>
+</select>
 
-          <option>
-            انستجرام
-          </option>
 
-          <option>
-            تيك توك
-          </option>
 
 
-        </select>
 
+<select
 
+value={goal}
 
+onChange={
+e=>setGoal(e.target.value)
+}
 
-        <button onClick={createPost}>
+>
 
-          {
-            loading
-            ?
-            "جاري الإنشاء..."
-            :
-            "إنشاء بالذكاء الاصطناعي"
-          }
+<option>
+زيادة المبيعات
+</option>
 
-        </button>
 
+<option>
+زيادة المتابعين
+</option>
 
 
+<option>
+إعلان ممول
+</option>
 
-        {
-          result &&
 
-          <div className="result">
+<option>
+بناء علامة تجارية
+</option>
 
 
-            <h3>
-              النتيجة:
-            </h3>
+</select>
 
 
-            <p>
-              {result}
-            </p>
 
 
 
-            <button onClick={copyContent}>
 
-              {
-                copied
-                ?
-                "✅ تم النسخ"
-                :
-                "📋 نسخ المحتوى"
-              }
+<select
 
-            </button>
+value={type}
 
+onChange={
+e=>setType(e.target.value)
+}
 
-          </div>
+>
 
-        }
+<option>
+إعلان
+</option>
 
 
+<option>
+منشور تسويقي
+</option>
 
 
-      </div>
+<option>
+عرض منتج
+</option>
 
 
+<option>
+تهنئة
+</option>
 
 
+</select>
 
-      <div className="card">
 
 
-        <h2>
-          📋 آخر المنشورات
-        </h2>
 
 
 
-        {
-          dashboard.latest_posts.map(post=>(
+<select
 
-            <div className="post"
-            key={post.id}>
+value={platform}
 
+onChange={
+e=>setPlatform(e.target.value)
+}
 
-              <b>
-                {post.idea}
-              </b>
+>
 
 
-              <p>
-                المجال: {post.field}
-              </p>
+<option>
+فيسبوك
+</option>
 
 
-              <p>
-                المنصة: {post.platform}
-              </p>
+<option>
+انستجرام
+</option>
 
 
+<option>
+تيك توك
+</option>
 
-            </div>
 
+<option>
+لينكدإن
+</option>
 
-          ))
-        }
 
+</select>
 
-      </div>
 
 
 
 
-    </div>
 
-  );
+
+<button onClick={createPost}>
+
+
+{
+loading
+?
+"⏳ جاري الإنشاء..."
+:
+"🚀 إنشاء بالذكاء الاصطناعي"
+}
+
+
+</button>
+
+
+
+
+
+
+
+{
+result &&
+
+
+<div className="result">
+
+
+<h3>
+النتيجة:
+</h3>
+
+
+<p>
+{result}
+</p>
+
+
+
+<button onClick={copyContent}>
+
+
+{
+copied
+?
+"✅ تم النسخ"
+:
+"📋 نسخ المحتوى"
+}
+
+
+</button>
+
+
+
+</div>
+
+
+
+}
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<div className="card">
+
+
+<h2>
+📋 آخر المنشورات
+</h2>
+
+
+
+
+{
+dashboard.latest_posts.map(post=>(
+
+
+<div className="post" key={post.id}>
+
+
+<h3>
+{post.idea}
+</h3>
+
+
+<p>
+📂 {post.field}
+</p>
+
+
+<p>
+🎯 {post.goal}
+</p>
+
+
+<p>
+📱 {post.platform}
+</p>
+
+
+</div>
+
+
+))
+
+}
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+);
+
+
 
 }
 
