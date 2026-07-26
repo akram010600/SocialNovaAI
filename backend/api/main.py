@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from database import save_post, get_posts
+from ai_engine import generate_content
 
 
 app = FastAPI()
@@ -10,16 +11,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-
     allow_origins=["*"],
-
     allow_credentials=True,
-
     allow_methods=["*"],
-
     allow_headers=["*"],
 )
-
 
 
 class PostRequest(BaseModel):
@@ -36,7 +32,6 @@ class PostRequest(BaseModel):
 
 
 
-
 @app.get("/api/")
 def home():
 
@@ -46,70 +41,31 @@ def home():
 
 
 
-
 @app.post("/api/create")
 def create_post(data: PostRequest):
 
-
-    result = f"""
-🚀 SocialNova AI
-
-✨ {data.idea}
-
-
-📂 المجال: {data.field}
-
-🎯 الهدف: {data.goal}
-
-📌 نوع المحتوى: {data.type}
-
-📱 المنصة: {data.platform}
-
-
-
-🔥 اصنع حضوراً قوياً لعلامتك التجارية!
-
-نقدم لك محتوى احترافي مصمم لجذب العملاء
-وزيادة التفاعل وتحقيق نتائج أفضل.
-
-
-✅ جودة
-
-✅ احتراف
-
-✅ نمو
-
-
-📩 تواصل معنا الآن
-
-
-#تسويق #نجاح #SocialNovaAI
-"""
+    result = generate_content(
+        data.idea,
+        data.field,
+        data.goal,
+        data.type,
+        data.platform
+    )
 
 
     save_post(
-
         data.idea,
-
         data.field,
-
         data.goal,
-
         data.type,
-
         data.platform,
-
         result
-
     )
 
 
     return {
-
         "result": result
-
     }
-
 
 
 
